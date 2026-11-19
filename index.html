@@ -2,10 +2,11 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#FFF8F0">
-    <title>蛋小灵 - 趣味背单词</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词精灵 - 趣味背单词</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/yinbiao.css">
+    <link rel="stylesheet" href="css/yb-games.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <!-- Google Analytics: 替换 GA_MEASUREMENT_ID 为你的 Tracking ID -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
@@ -31,7 +32,7 @@
     <nav class="sidebar" id="sidebar" role="navigation" aria-label="主导航">
         <div class="sidebar-top">
             <div class="sidebar-logo">🥚</div>
-            <div class="sidebar-title">蛋小灵</div>
+            <div class="sidebar-title">单词精灵</div>
             <button class="sidebar-toggle" onclick="App.toggleSidebar()" aria-label="折叠侧边栏">◀</button>
         </div>
         <div class="sidebar-nav">
@@ -47,7 +48,7 @@
                 <span class="nav-icon">🔄</span>
                 <span class="nav-label">复习</span>
             </button>
-            <button class="nav-item" data-screen="spell-screen" onclick="App.startChallenge()">
+            <button class="nav-item" data-screen="challenge-select-screen" onclick="App.showScreen('challenge-select-screen')">
                 <span class="nav-icon">🏆</span>
                 <span class="nav-label">挑战赛</span>
             </button>
@@ -65,9 +66,22 @@
             </button>
         </div>
         <div class="sidebar-bottom">
-            <div class="sidebar-user" id="sidebar-user">
+            <button class="sidebar-user" id="sidebar-user" type="button" onclick="App.openAccountMenu()" aria-label="账号菜单">
                 <span class="sidebar-avatar" id="sidebar-avatar">🥚</span>
                 <span class="sidebar-username" id="sidebar-username">未登录</span>
+                <span class="sidebar-user-caret">▾</span>
+            </button>
+            <div id="account-menu" class="account-menu hidden">
+                <div class="account-menu-title">账号</div>
+                <div id="save-status" class="save-status">未连接 SAVE 目录（点「立即保存到SAVE」选择）</div>
+                <div class="account-list" id="account-list"></div>
+                <div class="account-menu-actions">
+                    <button type="button" onclick="App.saveAccountToDisk()">💾 立即保存到SAVE</button>
+                    <button type="button" onclick="App.openAccountFromFile()">📂 从磁盘打开账号</button>
+                    <button type="button" onclick="App.exportAccountJson()">⬇ 导出 JSON</button>
+                    <button type="button" onclick="App.importAccountJson()">⬆ 导入 JSON</button>
+                    <button type="button" onclick="App.logout()">🚪 登出</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -78,7 +92,7 @@
         <div id="splash-screen" class="screen active">
             <div class="splash-content">
                 <div class="splash-logo">🥚</div>
-                <h1 class="splash-title">蛋小灵</h1>
+                <h1 class="splash-title">单词精灵</h1>
                 <p class="splash-subtitle">养一只精灵，背一串单词</p>
                 <button class="btn-primary btn-glow" onclick="App.start()">开始冒险</button>
             </div>
@@ -123,7 +137,18 @@
                 <h2>选择你的教材</h2>
                 <p class="hint-text">选择教材版本和年级</p>
                 <!-- 版本切换 -->
-                <div class="textbook-version-tabs" id="textbook-version-tabs"></div>
+                <div class="textbook-version-tabs">
+                    <button class="version-tab active" data-version="PEP" onclick="App.switchVersion('PEP')">人教版PEP</button>
+                    <button class="version-tab" data-version="WYS" onclick="App.switchVersion('WYS')">外研版</button>
+                    <button class="version-tab" data-version="YL" onclick="App.switchVersion('YL')">译林版</button>
+                    <button class="version-tab" data-version="BNU" onclick="App.switchVersion('BNU')">北师大版</button>
+                    <button class="version-tab" data-version="MJ" onclick="App.switchVersion('MJ')">闽教版</button>
+                    <button class="version-tab" data-version="GD" onclick="App.switchVersion('GD')">广东开心版</button>
+                    <button class="version-tab" data-version="JJ" onclick="App.switchVersion('JJ')">冀教版</button>
+                    <button class="version-tab" data-version="SL" onclick="App.switchVersion('SL')">陕旅版</button>
+                    <button class="version-tab" data-version="XS" onclick="App.switchVersion('XS')">湘少版</button>
+                    <button class="version-tab" data-version="RA" onclick="App.switchVersion('RA')">仁爱版（初中）</button>
+                </div>
                 <div class="textbook-grid" id="textbook-grid"></div>
             </div>
         </div>
@@ -134,28 +159,8 @@
                 <div class="home-greeting">
                     <span id="home-user-name" class="user-name"></span>
                     <span id="home-streak" class="streak-badge">🔥 0天</span>
-                    <button id="home-textbook-tag" class="textbook-badge home-textbook-trigger" type="button"
-                            aria-expanded="false" aria-controls="home-textbook-dropdown"
-                            onclick="App.toggleHomeTextbookMenu()">
-                        <span id="home-textbook-label">📖 教材</span>
-                        <span class="textbook-chevron" aria-hidden="true">⌄</span>
-                    </button>
+                    <button type="button" id="home-textbook-tag" class="textbook-badge" onclick="App.openTextbookPicker()" aria-label="切换教材">📖 教材</button>
                 </div>
-                <div id="home-textbook-dropdown" class="home-textbook-dropdown" role="dialog"
-                     aria-label="选择教材" aria-hidden="true">
-                    <div class="home-textbook-dropdown-header">
-                        <div>
-                            <strong>切换教材</strong>
-                            <span>选择版本和年级册次</span>
-                        </div>
-                        <button class="home-textbook-close" type="button" aria-label="关闭教材选择"
-                                onclick="App.closeHomeTextbookMenu()">×</button>
-                    </div>
-                    <div class="textbook-version-tabs home-version-tabs" id="home-version-tabs"></div>
-                    <div class="textbook-grid home-textbook-grid" id="home-textbook-grid"></div>
-                </div>
-                <button class="home-textbook-backdrop" type="button" aria-label="关闭教材选择"
-                        onclick="App.closeHomeTextbookMenu()"></button>
             </div>
 
             <div class="home-dashboard">
@@ -209,8 +214,7 @@
                                 <div id="daily-word-cn" class="daily-word-cn"></div>
                                 <span id="daily-word-status" class="daily-word-status"></span>
                             </div>
-                            <button id="btn-daily-speak" class="btn-daily-speak" type="button"
-                                    aria-label="播放今日单词发音" onclick="App.speakDailyWord()">🔊</button>
+                            <button id="btn-daily-speak" class="btn-daily-speak" onclick="App.speakDailyWord()">🔊</button>
                         </div>
                     </div>
 
@@ -239,7 +243,7 @@
                             <span class="btn-label">复习</span>
                             <span class="btn-count" id="review-count">0个待复习</span>
                         </button>
-                        <button class="btn-action btn-challenge" onclick="App.startChallenge()">
+                        <button class="btn-action btn-challenge" onclick="App.showScreen('challenge-select-screen')">
                             <span class="btn-emoji">🏆</span>
                             <span class="btn-label">挑战赛</span>
                             <span class="btn-count">限时闯关</span>
@@ -293,12 +297,23 @@
                     <div id="learn-emoji" class="learn-emoji"></div>
                     <div class="word-display">
                         <div id="learn-word" class="word-main"></div>
-                        <div id="learn-phonetic" class="word-phonetic"></div>
-                        <button class="btn-speak" type="button" aria-label="播放单词发音"
-                                onclick="App.speakWord()">🔊</button>
+                        <div class="phonetic-row">
+                            <div id="learn-phonetic" class="word-phonetic"></div>
+                            <span id="learn-pos" class="word-pos hidden"></span>
+                        </div>
+                        <div id="learn-syllables" class="learn-syllables hidden"></div>
+                        <button id="btn-learn-speak" class="btn-speak" onclick="App.speakWord()" aria-label="朗读单词">🔊</button>
                     </div>
                     <div id="learn-meaning" class="word-meaning hidden"></div>
-                    <div id="learn-example" class="word-example hidden"></div>
+                    <div id="learn-forms-row" class="learn-forms-row hidden"><div id="learn-forms" class="word-forms"></div></div>
+                    <div id="learn-example-row" class="learn-example-row hidden">
+                        <div id="learn-example" class="word-example">
+                            <div id="learn-example-en" class="example-en"></div>
+                            <div id="learn-example-cn" class="example-cn hidden"></div>
+                        </div>
+                        <button id="btn-example-speak" class="btn-speak-example" onclick="App.speakExample()" aria-label="朗读例句">🔊</button>
+                    </div>
+                    <div id="learn-extra-section" class="card-extra-section hidden"></div>
                 </div>
                 <div class="learn-actions">
                     <button id="btn-show-answer" class="btn-primary btn-lg" onclick="App.showAnswer()">显示释义</button>
@@ -332,16 +347,101 @@
             </div>
         </div>
 
+        <!-- 挑战赛选择 -->
+        <div id="challenge-select-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" onclick="App.showScreen('home-screen')">← 返回首页</button>
+                <div class="screen-title">🏆 挑战赛</div>
+            </div>
+            <div class="challenge-select-layout">
+                <button type="button" class="challenge-mode-card" onclick="App.startChoiceChallenge('en2zh')">
+                    <span class="challenge-mode-icon">🔤</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">英选中（简单）</span>
+                        <span class="challenge-mode-desc">看英文单词，从 4 个中文释义中选正确答案</span>
+                    </span>
+                    <span class="challenge-mode-tag easy">简单</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startListenChallenge('en')">
+                    <span class="challenge-mode-icon">🔊</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">听音选词（简单）</span>
+                        <span class="challenge-mode-desc">听单词音频，从 4 个英文单词中选正确答案</span>
+                    </span>
+                    <span class="challenge-mode-tag easy">简单</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startListenChallenge('zh')">
+                    <span class="challenge-mode-icon">🎧</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">听音选词（简单2）</span>
+                        <span class="challenge-mode-desc">听单词音频，从 4 个中文释义中选正确答案</span>
+                    </span>
+                    <span class="challenge-mode-tag easy">简单2</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startChoiceChallenge('zh2en')">
+                    <span class="challenge-mode-icon">🈶</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">中选英（简单）</span>
+                        <span class="challenge-mode-desc">看中文释义，从 4 个英文单词中选正确答案</span>
+                    </span>
+                    <span class="challenge-mode-tag easy">简单</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startChallenge('easy')">
+                    <span class="challenge-mode-icon">🟢</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">单词拼写（简单）</span>
+                        <span class="challenge-mode-desc">上方随机显示一半字母，键盘只显示当前单词包含的字母（乱序）</span>
+                    </span>
+                    <span class="challenge-mode-tag easy">简单</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startChallenge('medium')">
+                    <span class="challenge-mode-icon">🔤</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">单词拼写（中等）</span>
+                        <span class="challenge-mode-desc">60 秒内拼出已学单词，键盘只显示该词包含的字母（乱序）</span>
+                    </span>
+                    <span class="challenge-mode-tag medium">中等</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startChallenge('medium2')">
+                    <span class="challenge-mode-icon">🧩</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">单词拼写（中等2）</span>
+                        <span class="challenge-mode-desc">26 个字母全显示，上方单词随机给出一半字母作为提示</span>
+                    </span>
+                    <span class="challenge-mode-tag medium">中等2</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startDragMatchChallenge()">
+                    <span class="challenge-mode-icon">🧲</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">拖拽游戏（中等）</span>
+                        <span class="challenge-mode-desc">把 6 个英文单词拖到对应中文释义上，也可点选配对</span>
+                    </span>
+                    <span class="challenge-mode-tag medium">中等</span>
+                </button>
+                <button type="button" class="challenge-mode-card" onclick="App.startChallenge('hard')">
+                    <span class="challenge-mode-icon">⌨️</span>
+                    <span class="challenge-mode-body">
+                        <span class="challenge-mode-title">单词拼写（困难）</span>
+                        <span class="challenge-mode-desc">60 秒内根据中文释义拼出已学单词</span>
+                    </span>
+                    <span class="challenge-mode-tag">困难</span>
+                </button>
+            </div>
+        </div>
+
         <!-- 拼写挑战 -->
         <div id="spell-screen" class="screen">
             <div class="screen-header">
-                <button class="btn-back" onclick="App.showScreen('home-screen')">← 返回首页</button>
-                <div class="screen-title">🏆 拼写挑战</div>
+                <button class="btn-back" onclick="App.showScreen('challenge-select-screen')">← 返回挑战列表</button>
+                <div class="screen-title" id="challenge-title">🏆 单词拼写（困难）</div>
                 <div class="timer" id="challenge-timer">⏱ 60s</div>
             </div>
             <div class="spell-layout">
                 <div class="spell-area">
-                    <div id="spell-meaning" class="spell-hint"></div>
+                    <div class="spell-hint-row">
+                        <div id="spell-meaning" class="spell-hint"></div>
+                        <button id="btn-challenge-speak" type="button" class="btn-speak-challenge" onclick="App.speakChallengeWord()" aria-label="朗读单词">🔊</button>
+                    </div>
                     <div id="spell-inputs" class="spell-inputs"></div>
                     <div id="spell-feedback" class="spell-feedback hidden"></div>
                 </div>
@@ -349,6 +449,45 @@
                     <div id="keyboard-keys" class="keyboard-keys"></div>
                 </div>
             </div>
+        </div>
+
+        <!-- 选择题挑战：英选中 / 中选英 -->
+        <div id="choice-challenge-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" onclick="App.showScreen('challenge-select-screen')">← 返回挑战列表</button>
+                <div class="screen-title" id="choice-challenge-title">🏆 英选中</div>
+                <div class="timer" id="choice-progress">1/10</div>
+            </div>
+            <div class="choice-challenge-layout">
+                <div class="choice-question-row">
+                    <div id="choice-question" class="choice-question"></div>
+                    <button id="btn-listen-speak" type="button" class="btn-speak-challenge hidden" onclick="App.speakListenWord()" aria-label="播放单词音频">🔊</button>
+                </div>
+                <div id="choice-options" class="choice-options"></div>
+                <div id="choice-feedback" class="choice-feedback hidden"></div>
+                <button id="choice-next" class="btn-primary btn-lg hidden" onclick="App.nextChoiceChallenge()">下一题</button>
+            </div>
+        </div>
+
+        <!-- 拖拽游戏 -->
+        <div id="drag-match-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" onclick="App.showScreen('challenge-select-screen')">← 返回挑战列表</button>
+                <div class="screen-title" id="drag-match-title">🏆 拖拽游戏（中等）</div>
+                <div class="timer" id="drag-match-progress">0/6</div>
+            </div>
+            <div class="drag-match-layout">
+                <div class="box">
+                    <h3>英文卡片</h3>
+                    <div id="drag-match-tokens" class="drag-match-list"></div>
+                </div>
+                <div class="box">
+                    <h3>拖到对应中文</h3>
+                    <div id="drag-match-targets" class="drag-match-list"></div>
+                </div>
+            </div>
+            <div id="drag-match-feedback" class="choice-feedback hidden"></div>
+            <button type="button" class="btn-primary btn-lg" onclick="App.nextDragMatchRound()">换一组</button>
         </div>
 
         <!-- 单词本 -->
@@ -370,6 +509,134 @@
                 <input type="text" id="wordbook-search-input" placeholder="搜索单词..." aria-label="搜索单词" oninput="App.searchWords(this.value)">
             </div>
             <div id="wordbook-list" class="wordbook-list"></div>
+        </div>
+
+        <!-- 音标课 -->
+        <div id="yb-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" id="btnBack">← 返回</button>
+                <div class="screen-title" id="title">音标课</div>
+                <div id="subtitle" class="screen-subtitle">16 课：字母、元音、辅音、组合与音节</div>
+            </div>
+            <div id="vHome">
+                <div class="card yb-intro"><p>点课程开始：字母名、元音、辅音、字母组合和音节。学与练使用本地录音，测试成绩会自动存入当前账号存档。</p></div>
+                <div class="yb-challenge-entry">
+                    <button type="button" class="btn-primary btn-lg" onclick="App.showScreen('yb-adventure-screen')">⚡ 字母大冒险</button>
+                    <button type="button" class="btn-secondary btn-lg" onclick="App.showScreen('yb-valley-screen')">✍️ 字母快乐谷</button>
+                </div>
+                <div id="lessons"></div>
+                <p class="hint">音标真人录音来自维基共享资源，许可见 <a href="audio/ipa/CREDITS.txt" target="_blank" rel="noopener">CREDITS.txt</a>。</p>
+            </div>
+            <div id="vLesson" hidden>
+                <div class="seg yb-tabs" id="tabs">
+                    <button type="button" data-t="learn" class="on">学</button>
+                    <button type="button" data-t="practice">练</button>
+                    <button type="button" data-t="test">测</button>
+                </div>
+                <div id="pane"></div>
+            </div>
+        </div>
+
+        <!-- 音标课挑战：字母大冒险 -->
+        <div id="yb-adventure-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" onclick="App.showScreen('yb-screen')">← 返回音标课</button>
+                <div class="screen-title">⚡ 字母大冒险</div>
+            </div>
+            <div class="yb-game-view active" id="adv-home">
+                <div class="yb-game-card">
+                    <h2>听音找字母</h2>
+                    <p>顶部会给出目标字母并播放发音。点中不断下落的相同字母即可得分，注意 b/d/p/q、l/I。</p>
+                    <button type="button" class="btn-primary btn-lg" onclick="YBAdventure.start()">开始游戏</button>
+                </div>
+            </div>
+            <div class="yb-game-view hidden" id="adv-game">
+                <div class="adv-hud">
+                    <span id="adv-time">⏱ 03:00</span>
+                    <span id="adv-score">得分 0</span>
+                    <span id="adv-combo">连击 0</span>
+                </div>
+                <div class="adv-progress"><i id="adv-progress-fill"></i></div>
+                <div class="adv-target">
+                    <span>找这个 →</span>
+                    <b id="adv-target-letter">b</b>
+                    <button type="button" id="adv-target-audio" onclick="YBAdventure.playTarget()">🔊</button>
+                </div>
+                <div class="adv-arena" id="adv-arena"></div>
+                <div class="adv-feedback" id="adv-feedback"></div>
+            </div>
+            <div class="yb-game-view hidden" id="adv-end">
+                <div class="yb-game-card">
+                    <h2>游戏结束</h2>
+                    <div class="adv-end-stars" id="adv-end-stars">⭐⭐⭐</div>
+                    <p id="adv-end-verdict"></p>
+                    <div class="adv-end-stats" id="adv-end-stats"></div>
+                    <div class="yb-challenge-entry">
+                        <button type="button" class="btn-primary btn-lg" onclick="YBAdventure.start()">再来一局</button>
+                        <button type="button" class="btn-secondary btn-lg" onclick="App.showScreen('yb-screen')">返回音标课</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 音标课挑战：字母快乐谷 -->
+        <div id="yb-valley-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" onclick="App.showScreen('yb-screen')">← 返回音标课</button>
+                <div class="screen-title">✍️ 字母快乐谷</div>
+            </div>
+            <div class="yb-game-view active" id="valley-home">
+                <div class="yb-game-card">
+                    <h2>26 个字母书写闯关</h2>
+                    <p>按灰色笔画和编号顺序描红大写字母，写好后提交评分。</p>
+                    <div class="valley-grid" id="valley-grid"></div>
+                </div>
+            </div>
+            <div class="yb-game-view hidden" id="valley-write">
+                <div class="valley-write-head">
+                    <button type="button" class="btn-back" onclick="YBValley.home()">← 返回</button>
+                    <h2 id="valley-current-letter">A</h2>
+                    <button type="button" class="btn-speak-challenge" onclick="YBValley.playLetter()" aria-label="播放字母读音">🔊</button>
+                </div>
+                <div class="valley-canvas-wrap">
+                    <svg id="valley-guide" viewBox="0 0 300 300" aria-hidden="true"></svg>
+                    <canvas id="valley-canvas" width="600" height="600"></canvas>
+                </div>
+                <div class="valley-feedback" id="valley-feedback">从编号 1 的起点开始，沿着灰色笔画书写。</div>
+                <div class="yb-challenge-entry">
+                    <button type="button" class="btn-secondary" onclick="YBValley.demo()">👀 示范</button>
+                    <button type="button" class="btn-secondary" onclick="YBValley.clear()">🧽 重写</button>
+                    <button type="button" class="btn-primary" onclick="YBValley.submit()">✅ 写好了</button>
+                </div>
+            </div>
+            <div class="yb-game-view hidden" id="valley-result">
+                <div class="yb-game-card">
+                    <h2 id="valley-result-letter">A</h2>
+                    <div class="valley-score" id="valley-score">90</div>
+                    <div class="adv-end-stars" id="valley-stars">⭐⭐⭐</div>
+                    <p id="valley-result-tip"></p>
+                    <div class="yb-challenge-entry">
+                        <button type="button" class="btn-secondary" onclick="YBValley.retry()">再写一次</button>
+                        <button type="button" class="btn-primary" onclick="YBValley.next()">下一个字母</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自然拼读课 -->
+        <div id="phonics-screen" class="screen">
+            <div class="screen-header">
+                <button class="btn-back" onclick="App.showScreen('home-screen')">← 返回首页</button>
+                <div class="screen-title">🧩 自然拼读课</div>
+            </div>
+            <div class="phonics-panel">
+                <p>输入英文单词，或点下面的词，查看音节拆分并逐节发音。</p>
+                <div class="phonics-search">
+                    <input type="text" id="phonics-input" placeholder="例如 banana" aria-label="输入英文单词">
+                    <button class="btn-primary" type="button" onclick="App.openPhonics(document.getElementById('phonics-input').value)">🔤 拼读</button>
+                </div>
+                <div id="phonics-list" class="phonics-list"></div>
+            </div>
         </div>
 
         <!-- 统计页面 -->
@@ -439,14 +706,22 @@
                     <div id="textbook-progress" class="textbook-progress-info">当前教材信息</div>
                     <div class="profile-textbook">
                         <h3>选择教材</h3>
-                        <div class="textbook-version-tabs" id="profile-version-tabs"></div>
+                        <div class="textbook-version-tabs" id="profile-version-tabs">
+                            <button class="version-tab active" data-version="PEP" onclick="App.switchVersionProfile('PEP')">人教版PEP</button>
+                            <button class="version-tab" data-version="WYS" onclick="App.switchVersionProfile('WYS')">外研版</button>
+                            <button class="version-tab" data-version="YL" onclick="App.switchVersionProfile('YL')">译林版</button>
+                            <button class="version-tab" data-version="BNU" onclick="App.switchVersionProfile('BNU')">北师大版</button>
+                            <button class="version-tab" data-version="MJ" onclick="App.switchVersionProfile('MJ')">闽教版</button>
+                            <button class="version-tab" data-version="GD" onclick="App.switchVersionProfile('GD')">广东开心版</button>
+                            <button class="version-tab" data-version="JJ" onclick="App.switchVersionProfile('JJ')">冀教版</button>
+                            <button class="version-tab" data-version="SL" onclick="App.switchVersionProfile('SL')">陕旅版</button>
+                            <button class="version-tab" data-version="XS" onclick="App.switchVersionProfile('XS')">湘少版</button>
+                            <button class="version-tab" data-version="RA" onclick="App.switchVersionProfile('RA')">仁爱版（初中）</button>
+                        </div>
                         <div class="textbook-select-grid" id="profile-textbook-grid"></div>
                     </div>
                     <div class="profile-actions">
-                        <button class="btn-secondary" onclick="App.exportData()">💾 导出备份</button>
-                        <button class="btn-secondary" onclick="App.chooseImportFile()">📥 导入备份</button>
                         <button class="btn-secondary" onclick="App.resetData()">🔄 重置进度</button>
-                        <input id="backup-file-input" class="hidden" type="file" accept="application/json,.json" onchange="App.importData(event)">
                     </div>
                 </div>
             </div>
@@ -464,46 +739,53 @@
         </div>
     </main>
 
-    <!-- 手机端底部导航：与桌面端侧边栏共用同一套功能入口 -->
-    <nav class="mobile-bottom-nav" aria-label="手机端主导航">
-        <button class="nav-item active" data-screen="home-screen" onclick="App.showScreen('home-screen')">
-            <span class="nav-icon">🏠</span><span class="nav-label">首页</span>
-        </button>
-        <button class="nav-item" data-screen="learn-screen" onclick="App.startLearn()">
-            <span class="nav-icon">📖</span><span class="nav-label">学习</span>
-        </button>
-        <button class="nav-item" data-screen="review-screen" onclick="App.startReview()">
-            <span class="nav-icon">🔄</span><span class="nav-label">复习</span>
-        </button>
-        <button class="nav-item" data-screen="spell-screen" onclick="App.startChallenge()">
-            <span class="nav-icon">🏆</span><span class="nav-label">挑战</span>
-        </button>
-        <button class="nav-item" data-screen="wordbook-screen" onclick="App.showScreen('wordbook-screen')">
-            <span class="nav-icon">📚</span><span class="nav-label">词本</span>
-        </button>
-        <button class="nav-item" data-screen="stats-screen" onclick="App.showScreen('stats-screen')">
-            <span class="nav-icon">📊</span><span class="nav-label">统计</span>
-        </button>
-        <button class="nav-item" data-screen="profile-screen" onclick="App.showScreen('profile-screen')">
-            <span class="nav-icon">👤</span><span class="nav-label">我的</span>
-        </button>
-    </nav>
-
-    <!-- 首页欢迎弹窗 -->
-    <div id="welcome-overlay" class="welcome-overlay">
-        <div class="welcome-modal">
-            <button class="welcome-close" onclick="App.closeWelcomeModal()" aria-label="关闭欢迎弹窗">×</button>
-            <div class="welcome-emoji">🥚</div>
-            <h2>欢迎使用蛋小灵</h2>
-            <p>一起把今天的单词轻轻拿下。</p>
-            <button class="btn-primary" onclick="App.closeWelcomeModal()">开始使用</button>
-        </div>
-    </div>
-
     <!-- Toast 通知容器 -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Modal 认框 -->
+    <!-- 首页教材切换弹层 -->
+    <div id="textbook-picker-overlay" class="modal-overlay textbook-picker-overlay" onclick="if(event.target===this) App.closeTextbookPicker()">
+        <div class="modal-content textbook-picker-content">
+            <div class="modal-title">切换教材</div>
+            <div class="picker-tools">
+                <button type="button" onclick="App.openCourseFromPicker('yb-screen')">🔤 音标课</button>
+                <button type="button" onclick="App.openCourseFromPicker('phonics-screen')">🧩 自然拼读</button>
+            </div>
+            <div id="textbook-picker-versions" class="textbook-version-tabs"></div>
+            <div id="textbook-picker-grid" class="textbook-select-grid"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="App.closeTextbookPicker()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 单词卡弹层（单词本点击单词打开） -->
+    <div id="word-card-overlay" class="modal-overlay word-card-overlay" onclick="if(event.target===this) App.closeWordCard()">
+        <div class="modal-content word-card-modal">
+            <button type="button" class="word-card-close" onclick="App.closeWordCard()" aria-label="关闭">✕</button>
+            <div id="wd-emoji" class="learn-emoji"></div>
+            <div class="word-display">
+                <div id="wd-word" class="word-main"></div>
+                <div class="phonetic-row">
+                    <div id="wd-phonetic" class="word-phonetic"></div>
+                    <span id="wd-pos" class="word-pos hidden"></span>
+                </div>
+                <div id="wd-syllables" class="learn-syllables hidden"></div>
+                <button id="wd-speak" type="button" class="btn-speak" onclick="App.speakCardWord()" aria-label="朗读单词">🔊</button>
+            </div>
+            <div id="wd-meaning" class="word-meaning"></div>
+            <div id="wd-forms-row" class="learn-forms-row hidden"><div id="wd-forms" class="word-forms"></div></div>
+            <div id="wd-example-row" class="learn-example-row hidden">
+                <div id="wd-example" class="word-example">
+                    <div id="wd-example-en" class="example-en"></div>
+                    <div id="wd-example-cn" class="example-cn hidden"></div>
+                </div>
+                <button id="wd-example-speak" type="button" class="btn-speak-example" onclick="App.speakCardExample()" aria-label="朗读例句">🔊</button>
+            </div>
+            <div id="wd-extra-section" class="card-extra-section hidden"></div>
+        </div>
+    </div>
+
+    <!-- Modal 确认框 -->
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <div id="modal-title" class="modal-title"></div>
@@ -515,6 +797,23 @@
         </div>
     </div>
 
+    <script src="words.js"></script>
+    <script src="word-cards-extra.js"></script>
+    <script src="audio/index.js"></script>
+    <script src="audio/sentence-index.js"></script>
+    <script src="audio/ipa-index.js"></script>
+    <script src="audio/syl-index.js"></script>
+    <script src="audio/pack-index.js"></script>
+    <script src="data/yinbiao.js"></script>
+    <script src="data/phonics-words.js"></script>
+    <script src="wordforms-exact.js"></script>
+    <script src="wordpos-exact.js"></script>
+    <script src="forms.js"></script>
+    <script src="examples-zh.js"></script>
+    <script src="audio.js"></script>
     <script src="app.js"></script>
+    <script src="js/phonics.js"></script>
+    <script src="js/yinbiao.js"></script>
+    <script src="js/yb-games.js"></script>
 </body>
 </html>

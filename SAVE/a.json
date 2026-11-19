@@ -1,0 +1,152 @@
+{
+  "userName": "a",
+  "grade": 3,
+  "textbook": "MJ_3上",
+  "petType": "water",
+  "petLevel": 1,
+  "petExp": 64,
+  "energy": 55,
+  "totalEnergy": 64,
+  "streak": 1,
+  "lastStudyDate": "2026-11-17",
+  "words": {
+    "MJ_3上_Miss": {
+      "word": "Miss",
+      "status": "learning",
+      "ease": 2.6,
+      "interval": 1,
+      "repetitions": 1,
+      "nextReview": 1794903641465,
+      "lastReview": 1794903641465,
+      "correctStreak": 0
+    },
+    "MJ_3上_name": {
+      "word": "name",
+      "status": "learning",
+      "ease": 2.06,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": 1794997152113,
+      "lastReview": 1794910752113,
+      "correctStreak": 0
+    },
+    "MJ_3上_ruler": {
+      "word": "ruler",
+      "status": "learning",
+      "ease": 2.7,
+      "interval": 3,
+      "repetitions": 2,
+      "nextReview": 1795166179453,
+      "lastReview": 1794906979453,
+      "correctStreak": 1
+    },
+    "MJ_3上_hi": {
+      "word": "hi",
+      "status": "learning",
+      "ease": 2.7,
+      "interval": 3,
+      "repetitions": 2,
+      "nextReview": 1795162855737,
+      "lastReview": 1794903655737,
+      "correctStreak": 0
+    },
+    "MJ_3上_family": {
+      "word": "family",
+      "status": "learning",
+      "ease": 2.6,
+      "interval": 1,
+      "repetitions": 1,
+      "nextReview": 1794903646912,
+      "lastReview": 1794903646912,
+      "correctStreak": 0
+    },
+    "MJ_3上_hello": {
+      "word": "hello",
+      "status": "learning",
+      "ease": 2.6,
+      "interval": 1,
+      "repetitions": 1,
+      "nextReview": 1794903662112,
+      "lastReview": 1794903662112,
+      "correctStreak": 0
+    },
+    "MJ_3上_goodbye": {
+      "word": "goodbye",
+      "status": "learning",
+      "ease": 2.7,
+      "interval": 3,
+      "repetitions": 2,
+      "nextReview": 1795166182841,
+      "lastReview": 1794906982841,
+      "correctStreak": 1
+    },
+    "MJ_3上_nine": {
+      "word": "nine",
+      "status": "learning",
+      "ease": 2.6,
+      "interval": 1,
+      "repetitions": 1,
+      "nextReview": 1794905967396,
+      "lastReview": 1794905967396,
+      "correctStreak": 0
+    },
+    "MJ_3下_T-shirt": {
+      "word": "T-shirt",
+      "status": "learning",
+      "ease": 2.16,
+      "interval": 1,
+      "repetitions": 0,
+      "nextReview": 1794906121054,
+      "lastReview": 1794906121054,
+      "correctStreak": 0
+    },
+    "MJ_3下_jump": {
+      "word": "jump",
+      "status": "learning",
+      "ease": 2.6,
+      "interval": 1,
+      "repetitions": 1,
+      "nextReview": 1794906131723,
+      "lastReview": 1794906131723,
+      "correctStreak": 0
+    }
+  },
+  "totalLearned": 10,
+  "masteredCount": 0,
+  "perfectReviews": 1,
+  "bestChallengeScore": 0,
+  "achievements": [
+    "first",
+    "perfect",
+    "egg",
+    "ten"
+  ],
+  "dailyStats": {
+    "2026-11-17": {
+      "learned": 10,
+      "reviewed": 6,
+      "correct": 4,
+      "total": 6
+    }
+  },
+  "dailyGoal": 10,
+  "dailyLearned": 16,
+  "todayKey": "2026-11-17",
+  "setupDone": true,
+  "visitLog": {
+    "2026-11-10": {
+      "visits": 4,
+      "firstVisit": 1794321279500
+    },
+    "2026-11-16": {
+      "visits": 1,
+      "firstVisit": 1794798717758
+    },
+    "2026-11-17": {
+      "visits": 13,
+      "firstVisit": 1794903548353
+    }
+  },
+  "updatedAt": 1794914740296,
+  "_pendingLevelUp": false
+}

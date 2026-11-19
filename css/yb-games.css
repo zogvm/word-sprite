@@ -1,0 +1,69 @@
+/* 音标课挑战游戏：字母大冒险 / 字母快乐谷 */
+.yb-challenge-entry { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 16px 0 22px; }
+.yb-challenge-entry .btn { min-height: 48px; padding: 10px 18px; }
+.yb-game-view .btn {
+    min-height: 48px; padding: 12px 28px; border: 2px solid var(--border);
+    border-radius: var(--radius-full); background: var(--bg-card); color: var(--text);
+    font: inherit; font-size: 16px; font-weight: 800; cursor: pointer;
+    transition: var(--transition); box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.yb-game-view .btn:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: 0 8px 18px var(--primary-glow); }
+.yb-game-view .btn:active { transform: translateY(0) scale(0.97); }
+.yb-game-view .btn.primary, .yb-game-view .btn.big.primary {
+    border: none; color: #fff; padding: 16px 52px; font-size: 19px;
+    background: linear-gradient(135deg, var(--primary), #FF6E7A);
+    box-shadow: 0 6px 20px var(--primary-glow), 0 0 12px rgba(255,71,87,0.2);
+}
+.yb-game-view .btn.big { padding: 16px 42px; font-size: 18px; }
+.yb-game-view .btn.big.primary { padding: 16px 52px; font-size: 19px; }
+.yb-game-card { max-width: 680px; margin: 32px auto; padding: 24px 28px; text-align: center; border: 2px solid var(--border); border-radius: var(--radius); background: var(--bg-card); box-shadow: var(--shadow-sm); }
+#yb-valley-screen .yb-game-card { width: 100%; max-width: none; }
+.yb-game-card h2 { color: var(--text); font-size: 22px; margin-bottom: 12px; }
+.yb-game-card p { color: var(--text-light); font-weight: 600; line-height: 1.7; }
+.yb-game-view { width: 100%; max-width: 1180px; margin: 0 auto; padding: 16px 20px 40px; box-sizing: border-box; }
+#yb-adventure-screen .yb-game-view,
+#yb-valley-screen .yb-game-view { max-width: none; padding-left: 14px; padding-right: 14px; }
+
+/* 字母大冒险 */
+.adv-hud { display: flex; justify-content: space-between; gap: 10px; font-weight: 800; color: var(--text); }
+.adv-progress { height: 10px; margin: 10px 0 16px; border-radius: 999px; background: var(--border); overflow: hidden; }
+.adv-progress i { display: block; width: 100%; height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); transition: width 1s linear; }
+.adv-target { display: flex; align-items: center; justify-content: center; gap: 14px; font-weight: 800; color: var(--text-light); }
+.adv-target b { font-size: 44px; color: var(--primary); line-height: 1; }
+.adv-target button, #adv-target-audio { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 20px; }
+.adv-arena { position: relative; width: 100%; min-height: min(68vh, 720px); height: min(68vh, 720px); margin-top: 16px; border: 3px dashed var(--border); border-radius: var(--radius); background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,240,230,0.35)); overflow: hidden; touch-action: manipulation; box-sizing: border-box; }
+.falling-letter { position: absolute; top: 0; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 16px; border: 3px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 28px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 rgba(0,0,0,0.08); user-select: none; touch-action: manipulation; transition: transform 0.12s ease; }
+.falling-letter.wrong { border-color: var(--danger); background: var(--danger-light); animation: shake 0.3s ease; }
+.falling-letter.correct { border-color: var(--success); background: var(--success-light); }
+.adv-feedback { min-height: 28px; margin-top: 10px; text-align: center; font-weight: 800; color: var(--text-light); }
+.adv-end-stars { font-size: 40px; letter-spacing: 6px; margin: 12px 0; }
+.adv-end-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
+.adv-end-stats div { padding: 12px; border-radius: var(--radius-sm); background: var(--primary-light); color: var(--text); font-weight: 800; }
+
+/* 字母快乐谷 */
+.valley-grid { display: grid; grid-template-columns: repeat(13, minmax(52px, 1fr)); gap: 12px; margin-top: 18px; }
+.valley-letter-btn { min-height: 64px; border: 2px solid var(--border); border-radius: 14px; background: var(--bg-card); color: var(--text); font-size: 20px; font-weight: 900; cursor: pointer; touch-action: manipulation; transition: var(--transition); }
+.valley-letter-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+.valley-letter-btn.mastered { border-color: var(--success); background: var(--success-light); }
+.valley-write-head { display: flex; align-items: center; justify-content: flex-start; gap: 12px; }
+.valley-write-head h2 { margin: 0; font-size: 28px; color: var(--text); }
+.valley-write-head .btn-speak-challenge { margin-left: 2px; }
+.valley-canvas-wrap { position: relative; width: min(94vw, 520px); aspect-ratio: 1; margin: 18px auto; border: 3px solid var(--border); border-radius: var(--radius); background: var(--bg-card); overflow: hidden; }
+.valley-canvas-wrap svg, .valley-canvas-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.valley-canvas-wrap svg { pointer-events: none; }
+.valley-canvas-wrap canvas { touch-action: none; cursor: crosshair; }
+.valley-guide-path { fill: none; stroke: rgba(90,90,110,0.32); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
+.valley-guide-demo { fill: none; stroke: var(--primary); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 0 1000; animation: valley-draw 1.2s ease forwards; }
+.valley-guide-num { font-size: 14px; font-weight: 900; fill: var(--primary); }
+.valley-guide-start { fill: var(--success); }
+.valley-feedback { text-align: center; min-height: 32px; color: var(--text-light); font-weight: 700; }
+.valley-score { font-size: 64px; font-weight: 900; color: var(--primary); }
+@keyframes valley-draw { to { stroke-dasharray: 1000 0; } }
+
+@media (max-width: 768px) {
+    .valley-grid { grid-template-columns: repeat(7, minmax(46px, 1fr)); gap: 10px; }
+    #yb-valley-screen .yb-game-view { padding-left: 8px; padding-right: 8px; }
+    .adv-end-stats { grid-template-columns: 1fr; }
+    #yb-adventure-screen .yb-game-view { padding-left: 8px; padding-right: 8px; }
+    .adv-arena { min-height: 64vh; height: 64vh; }
+}
